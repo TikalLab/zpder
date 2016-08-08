@@ -1,0 +1,13 @@
+{
+	"github": {
+		"client_id": "30e321285d1cb51855c5",
+		"client_secret": "c08a0eda1543afaa4fc581303ad30a0f84271ad1",
+		"redirect_domain": "localhost:3000",
+	},
+	"app": {
+		"name": "zpder",
+		"domain": "localhost:3000",
+		"email": "shahar@gnift.com",
+		"cdn_url": ""
+	},
+}
