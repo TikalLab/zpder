@@ -1,0 +1,14 @@
+{
+	"github": {
+		"client_id": "da80b99541df19597b5f",
+		"client_secret": "efdbcf6350fa9ccd88f0821b73b2ad6994146141",
+		"redirect_domain": "zpder-staging.herokuapp.com"
+	},
+	"app": {
+		"name": "zpder",
+		"domain": "zpder-staging.herokuapp.com",
+		"email": "shahar@gnift.com",
+		"cookie_secret": "Black Hole Sun",
+		"cdn_url": ""
+	}
+}
