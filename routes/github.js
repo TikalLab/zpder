@@ -57,7 +57,7 @@ router.get('/authorized', function(req, res, next) {
 		},
 		// get the github user record
 		function(accessToken,callback){
-			var headers = github.getAPIHeaders(accessToken,config.get('app.name'));
+			var headers = github.getAPIHeaders(accessToken);
 			request('https://api.github.com/user',{headers: headers},function(error,response,body){
 				if(error){
 					callback(error);
@@ -70,7 +70,7 @@ router.get('/authorized', function(req, res, next) {
 		},
 		// get the email
 		function(accessToken,githubUser,callback){
-			var headers = github.getAPIHeaders(req.session.user.github.access_token,config.get('app.name'));
+			var headers = github.getAPIHeaders(accessToken);
 			request('https://api.github.com/user/emails',{headers: headers},function(error,response,body){
 				if(error){
 					callback(error);
