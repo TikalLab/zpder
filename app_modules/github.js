@@ -19,6 +19,10 @@ module.exports = {
 		var page = 1;
 		var linkHeader;
 		
+		var qs = {
+			affiliation: 'owner,collaborator'	
+		}
+		
 		async.whilst(
 			function(){
 				return page;
@@ -45,14 +49,16 @@ module.exports = {
 	},
 	getRepoPackage: function(accessToken,repo,callback){
 		var headers = this.getAPIHeaders(accessToken);
-		request('https://api.github.com/repos' + repo + '/contents/package.json',{headers: headers},function(error,response,body){
+		request('https://api.github.com/repos/' + repo + '/contents/package.json',{headers: headers},function(error,response,body){
 			if(error){
 				callback(error);
+			}else if(response.statusCode == 404){
+				callback(null,null);
 			}else if(response.statusCode > 300){
 				callback(response.statusCode + ' : ' + body);
 			}else{
 				var data = JSON.parse(body)
-console.log('package file for %s is: %s',repo.util.inspect(data))				
+console.log('package file for %s is: %s',repo,util.inspect(data))				
 				callback(null,data);
 			}
 		});	
