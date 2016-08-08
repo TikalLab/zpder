@@ -10,6 +10,7 @@ var url = require('url');
 var async = require('async');
 var nl2br = require('nl2br');
 var marked = require('marked');
+var atob = require('atob')
 
 var errorHandler = require('../app_modules/error');
 var github = require('../app_modules/github');
@@ -33,7 +34,9 @@ router.get('/explore', function(req, res, next) {
 					if(err){
 						callback(err)
 					}else{
-						packages.push(pkg)
+						if(pkg){
+							packages.push(pkg)
+						}
 						callback()
 					}
 				})
@@ -45,8 +48,19 @@ router.get('/explore', function(req, res, next) {
 		if(err){
 			errorHandler.error(req,res,next,err)
 		}else{
+			
+			// process what we got
+			var allPacakges = [];
+			_.each(packages,function(pkg){
+				if('content' in pkg){
+					var dependencies = JSON.parse(atob(pkg.content)).dependencies;
+					allPacakges = allPacakges.concat(_.keys(dependencies))
+				}
+			})
+			allPacakges = _.uniq(allPacakges);
+			console.log('all my pacakges are: %s',util.inspect(allPacakges))
 			render(req,res,'index/explore',{
-				packages: packages
+				packages: allPacakges
 			})
 		}
 	})
