@@ -30,12 +30,22 @@ router.get('/explore', function(req, res, next) {
 		function(repos,callback){
 			var packages = [];
 			async.each(repos,function(repo,callback){
-				github.getRepoPackage(req.session.user.github.access_token,repo.full_name,function(err,pkg){
+//				github.getRepoPackage(req.session.user.github.access_token,repo.full_name,function(err,pkg){
+//					if(err){
+//						callback(err)
+//					}else{
+//						if(pkg){
+//							packages.push(pkg)
+//						}
+//						callback()
+//					}
+//				})
+				github.searchRepoPackages(req.session.user.github.access_token,repo.full_name,function(err,repoPackages){
 					if(err){
 						callback(err)
 					}else{
-						if(pkg){
-							packages.push(pkg)
+						if(repoPackages){
+							packages = packages.concat(repoPackages)
 						}
 						callback()
 					}

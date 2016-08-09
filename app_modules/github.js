@@ -66,6 +66,7 @@ console.log('package file for %s is: %s',repo,util.inspect(data))
 	},
 	// this looks for all package.json files in the master branch, and ignores node_modules
 	getRepoPackages: function(accessToken,repo,callback){
+		var thisObject = this;
 		var headers = this.getAPIHeaders(accessToken);
 		
 		async.waterfall([
@@ -77,16 +78,41 @@ console.log('package file for %s is: %s',repo,util.inspect(data))
 					}else if(response.statusCode > 300){
 						callback(response.statusCode + ' : ' + body);
 					}else{
-						var data = JSON.parse(body)
-						callback(null,data);
+						var master = JSON.parse(body)
+console.log('master of %s is: %s',repo,util.inspect(master))						
+						callback(null,master);
 					}
 				});	
 			},
 			function(master,callback){
-				
+				thisObject.getTreeRecursively(accessToken,repo,master.object.sha,function(err,items){
+					callback(err,items)
+				})
+			},
+			function(items,callback){
+				var packages = [];
+				async.each(items,function(item,callback){
+					if(item.path != 'package.json'){
+						callback()
+					}else{
+						request(item.url,{headers: headers},function(error,response,body){
+							if(error){
+								callback(error);
+							}else if(response.statusCode > 300){
+								callback(response.statusCode + ' : ' + body);
+							}else{
+								var data = JSON.parse(body)
+								packages.push(data);
+								callback();
+							}
+						});	
+					} 
+				},function(err){
+					callback(err,packages)
+				})
 			}
-		],function(err){
-			
+		],function(err,packages){
+			callback(err,packages)
 		})
 		
 		
@@ -95,15 +121,16 @@ console.log('package file for %s is: %s',repo,util.inspect(data))
 		var thisObject = this;
 		var headers = this.getAPIHeaders(accessToken);
 		var items = [];
-		aysnc.waterfall([
+		async.waterfall([
 			function(callback){
-				request('https://api.github.com/repos/' + repo + '/git/tress/' + sha,{headers: headers},function(error,response,body){
+				request('https://api.github.com/repos/' + repo + '/git/trees/' + sha,{headers: headers},function(error,response,body){
 					if(error){
 						callback(error);
 					}else if(response.statusCode > 300){
 						callback(response.statusCode + ' : ' + body);
 					}else{
 						var data = JSON.parse(body)
+console.log('tree for %s is: %s',sha,util.inspect(data.tree))						
 						callback(null,data.tree);
 					}
 				});	
@@ -111,19 +138,66 @@ console.log('package file for %s is: %s',repo,util.inspect(data))
 			function(tree,callback){
 				async.each(tree,function(item,callback){
 					if(item.type == 'tree'){
-						thisObject.getTreeRecursively(accessToken, repo, item.sha, callback)
+						thisObject.getTreeRecursively(accessToken, repo, item.sha, function(err,newItems){
+							if(err){
+								callback(err)
+							}else{
+								items = items.concat(newItems)
+								callback();
+							}
+						})
 					}else{
 						items.push(item);
 						callback();
 					}
 				},function(err){
-					
+					callback(err)
 				})
 			}
 		],function(err){
-			
+			callback(err,items)
 		})
 		
+	},
+	searchRepoPackages: function(accessToken,repo,callback){
+		async.waterfall([
+			function(callback){
+				request('https://api.github.com/search/code?q=package.json+in:path+repo:' + repo,{headers: headers},function(error,response,body){
+					if(error){
+						callback(error);
+					}else if(response.statusCode > 300){
+						callback(response.statusCode + ' : ' + body);
+					}else{
+						var data = JSON.parse(body)
+						callback(null,data);
+					}
+				});	
+			}, 
+			function(searchResults,callback){
+				var packages = [];
+				async.each(searchResults.items,function(item,callback){
+					if(item.name != 'package.json'){
+						callback()
+					}else{
+						request(item.url,{headers: headers},function(error,response,body){
+							if(error){
+								callback(error);
+							}else if(response.statusCode > 300){
+								callback(response.statusCode + ' : ' + body);
+							}else{
+								var data = JSON.parse(body)
+								packages.push(data);
+								callback();
+							}
+						});	
+					}
+				},function(err){
+					callback(err,packages)
+				})
+			}
+		],function(err,packages){
+			callback(err,packages)
+		})
 	}
 
 
