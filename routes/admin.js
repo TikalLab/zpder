@@ -35,6 +35,7 @@ console.log('recieved this distinct list of pkgs: %s',util.inspect(packages))
 			})
 		},
 		function(packages,callback){
+			packages.sort()
 			async.each(packages,function(pkg,callback){
 				updatePackageVersion(pkg,req.db,function(err){
 					callback(err)
@@ -114,6 +115,7 @@ function indexUser(user,db,callback){
  				}
  			})
  			allPacakges = _.uniq(allPacakges);
+ 			allPacakges.sort()
  			var users = db.get('users');
  			users.findAndModify({
  				_id: user._id
@@ -177,7 +179,7 @@ function updatePackageVersion(pkg,db,callback){
 		},
 		function(version,pkgObj,callback){
 			if(pkgObj && version == pkgObj.version){
-				callback(null,false)
+				callback(null,false,false)
 			}else{
 				var isNew = !pkgObj;
 				packages.findAndModify({name: pkg},{$set:{version: version}},{new: true, upsert: true},function(err,pkgObj){
