@@ -44,12 +44,7 @@ router.get('/explore', function(req, res, next) {
 				callback(err,packages)
 			})
 		},
-	],function(err,packages){
-		if(err){
-			errorHandler.error(req,res,next,err)
-		}else{
-			
-			// process what we got
+		function(packages,callback){
 			var allPacakges = [];
 			_.each(packages,function(pkg){
 				if('content' in pkg){
@@ -58,9 +53,30 @@ router.get('/explore', function(req, res, next) {
 				}
 			})
 			allPacakges = _.uniq(allPacakges);
-			console.log('all my pacakges are: %s',util.inspect(allPacakges))
+			var users = req.db.get('users');
+			users.findAndModify({
+				_id: req.session.user._id
+			},{
+				$set: {packages: allPacakges}
+			},{
+				new: true
+			},function(err,user){
+				if(err){
+					callback(err)
+				}else{
+					callback(err,user)
+				}
+			})
+		}
+	],function(err,user){
+		if(err){
+			errorHandler.error(req,res,next,err)
+		}else{
+			req.session.user = user
+			
+			// process what we got
 			render(req,res,'index/explore',{
-				packages: allPacakges
+				packages: user.packages
 			})
 		}
 	})

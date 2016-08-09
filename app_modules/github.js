@@ -28,7 +28,7 @@ module.exports = {
 				return page;
 			},
 			function(callback){
-				request('https://api.github.com/user/repos?page=' + page,{headers: headers},function(error,response,body){
+				request('https://api.github.com/user/repos?page=' + page,{headers: headers, qs: qs},function(error,response,body){
 					if(error){
 						callback(error);
 					}else if(response.statusCode > 300){
