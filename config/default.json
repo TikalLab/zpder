@@ -11,7 +11,7 @@
 	"app": {
 		"name": "zpder",
 		"domain": "localhost:3000",
-		"email": "shahar@gnift.com",
+		"email": "support@zpder.com",
 		"cookie_secret": "Black Hole Sun",
 		"unsubscribe_secret": "Black Hole Sun",
 		"cdn_url": ""
