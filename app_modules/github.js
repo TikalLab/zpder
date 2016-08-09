@@ -47,6 +47,7 @@ module.exports = {
 			}
 		);
 	},
+	// this gets a package.json in the root of the repo
 	getRepoPackage: function(accessToken,repo,callback){
 		var headers = this.getAPIHeaders(accessToken);
 		request('https://api.github.com/repos/' + repo + '/contents/package.json',{headers: headers},function(error,response,body){
@@ -62,6 +63,68 @@ console.log('package file for %s is: %s',repo,util.inspect(data))
 				callback(null,data);
 			}
 		});	
+	},
+	// this looks for all package.json files in the master branch, and ignores node_modules
+	getRepoPackages: function(accessToken,repo,callback){
+		var headers = this.getAPIHeaders(accessToken);
+		
+		async.waterfall([
+			// get the master branch's sha...                 
+			function(callback){
+				request('https://api.github.com/repos/' + repo + '/git/refs/heads/master',{headers: headers},function(error,response,body){
+					if(error){
+						callback(error);
+					}else if(response.statusCode > 300){
+						callback(response.statusCode + ' : ' + body);
+					}else{
+						var data = JSON.parse(body)
+						callback(null,data);
+					}
+				});	
+			},
+			function(master,callback){
+				
+			}
+		],function(err){
+			
+		})
+		
+		
+	},
+	getTreeRecursively: function(accessToken,repo,sha,callback){
+		var thisObject = this;
+		var headers = this.getAPIHeaders(accessToken);
+		var items = [];
+		aysnc.waterfall([
+			function(callback){
+				request('https://api.github.com/repos/' + repo + '/git/tress/' + sha,{headers: headers},function(error,response,body){
+					if(error){
+						callback(error);
+					}else if(response.statusCode > 300){
+						callback(response.statusCode + ' : ' + body);
+					}else{
+						var data = JSON.parse(body)
+						callback(null,data.tree);
+					}
+				});	
+			},
+			function(tree,callback){
+				async.each(tree,function(item,callback){
+					if(item.type == 'tree'){
+						thisObject.getTreeRecursively(accessToken, repo, item.sha, callback)
+					}else{
+						items.push(item);
+						callback();
+					}
+				},function(err){
+					
+				})
+			}
+		],function(err){
+			
+		})
+		
 	}
+
 
 }
