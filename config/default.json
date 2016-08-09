@@ -9,7 +9,7 @@
 		"domain": "infoxicate.com"
 	},
 	"app": {
-		"name": "zpder",
+		"name": "zpder-dev",
 		"domain": "localhost:3000",
 		"email": "support@zpder.com",
 		"cookie_secret": "Black Hole Sun",

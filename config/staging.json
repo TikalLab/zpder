@@ -9,7 +9,7 @@
 		"domain": "infoxicate.com"
 	},
 	"app": {
-		"name": "zpder",
+		"name": "zpder-staging",
 		"domain": "zpder-staging.herokuapp.com",
 		"email": "support@zpder.com",
 		"cookie_secret": "Black Hole Sun",
