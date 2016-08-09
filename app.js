@@ -19,7 +19,7 @@ var db = monk(mongoUri);
 
 var index = require('./routes/index');
 //var users = require('./routes/users');
-//var admin = require('./routes/admin');
+var admin = require('./routes/admin');
 //var google = require('./routes/google');
 var github = require('./routes/github');
 //var admin = require('./routes/admin');
@@ -64,7 +64,7 @@ app.use(function(req,res,next){
 
 app.use('/', index);
 //app.use('/', users);
-//app.use('/admin', admin);
+app.use('/admin', admin);
 //app.use('/google', google);
 app.use('/github', github);
 
