@@ -4,11 +4,16 @@
 		"client_secret": "c08a0eda1543afaa4fc581303ad30a0f84271ad1",
 		"redirect_domain": "localhost:3000"
 	},
+	"mailgun": {
+		"api_key": "key-4k17ddypozi32xw7o9201-smeezy4fl8",
+		"domain": "infoxicate.com"
+	},
 	"app": {
 		"name": "zpder",
 		"domain": "localhost:3000",
 		"email": "shahar@gnift.com",
 		"cookie_secret": "Black Hole Sun",
+		"unsubscribe_secret": "Black Hole Sun",
 		"cdn_url": ""
 	}
 }

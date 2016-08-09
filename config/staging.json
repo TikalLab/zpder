@@ -4,11 +4,16 @@
 		"client_secret": "efdbcf6350fa9ccd88f0821b73b2ad6994146141",
 		"redirect_domain": "zpder-staging.herokuapp.com"
 	},
+	"mailgun": {
+		"api_key": "key-4k17ddypozi32xw7o9201-smeezy4fl8",
+		"domain": "infoxicate.com"
+	},
 	"app": {
 		"name": "zpder",
 		"domain": "zpder-staging.herokuapp.com",
 		"email": "shahar@gnift.com",
 		"cookie_secret": "Black Hole Sun",
+		"unsubscribe_secret": "Black Hole Sun",
 		"cdn_url": ""
 	}
 }

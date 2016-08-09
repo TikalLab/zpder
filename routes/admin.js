@@ -32,8 +32,8 @@ router.post('/maintain', function(req, res, next) {
 		},
 		function(packages,callback){
 			async.each(packages,function(pkg,callback){
-				getPackageVersion(pkg,function(err,version){
-					callback(err,version)
+				updatePackageVersion(pkg,req.db,function(err){
+					callback(err)
 				})
 			},function(err){
 				callback(err)
@@ -62,6 +62,58 @@ function getPackageVersion(pkg,callback){
 			callback(version)
 		}
 	})
+}
+
+function updatePackageVersion(pkg,db,callback){
+	
+	async.waterfall([
+		function(callback){
+			request('https://www.npmjs.com/package/' + pkg,function(error,response,body){
+				if(error){
+					callback(error)
+				}else if(response.statusCode > 300){
+					callback(response.statusCode + ' : ' + body);
+				}else{
+					var $ = cheerio.load(body);
+					var version = $('.sidebar .box li:nth-child(2) strong').html()
+//					console.log('version of %s is %s',pkg,version)
+					callback(null,version)
+				}
+			})
+		},
+		function(version,callback){
+			var packages = db.get('packages');
+			pacakges.findOne({name: pkg},function(err,pkg){
+				callback(err,version,pkg)
+			})
+		},
+		function(version,pkg,callback){
+			if(version == pkg.version){
+				callback(null,false)
+			}else{
+				packages.findAndModify({_id: pkg._id.toString()},{$set:{version: version}},{new: true},function(err,pkg){
+					callback(err,pkg)
+				})
+			}
+		},
+		function(pkg,callback){
+			if(!pkg){
+				callback()
+			}else{
+				notifyUsers(pkg,db,function(err){
+					callback(err)
+				})
+			}
+		}
+	],function(err){
+		callback(err)
+	})
+	
+	
+}
+
+function notifyUsers(pkg,db,callback){
+	
 }
 
 function render(req,res,template,params){
