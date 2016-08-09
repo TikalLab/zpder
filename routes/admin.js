@@ -97,13 +97,14 @@ function updatePackageVersion(pkg,db,callback){
 			if(pkgObj && version == pkgObj.version){
 				callback(null,false)
 			}else{
+				var isNew = !pkgObj;
 				packages.findAndModify({name: pkg},{$set:{version: version}},{new: true, upsert: true},function(err,pkgObj){
-					callback(err,pkgObj)
+					callback(err,pkgObj,isNew)
 				})
 			}
 		},
-		function(pkgObj){
-			if(!pkgObj){
+		function(pkgObj,isNew,callback){
+			if(!pkgObj || isNew){
 				callback()
 			}else{
 				notifyUsers(pkgObj,db,function(err){
