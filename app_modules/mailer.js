@@ -45,7 +45,7 @@ module.exports = {
 				to.push(recipient.email);
 				recipientVariables[recipient.email] = {
 //					"name": recipient.github.username,
-					"name": recipient.google.name.givenName ? recipient.google.name.givenName : recipient.google.display_name,
+					"name": recipient.github.username,
 					"id" : recipient._id.toString(),
 					"code": unsubscriber.encode(recipient._id.toString())
 				}

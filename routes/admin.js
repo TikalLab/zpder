@@ -112,7 +112,36 @@ function updatePackageVersion(pkg,db,callback){
 	
 }
 
+var packageUpdatedTemplate = fs.readFileSync(path.join(__dirname,'../views/emails/package-updated.ejs'), 'utf8');
+
 function notifyUsers(pkg,db,callback){
+	
+	async.waterfall([
+		function(callback){
+			var users = db.get('users');
+			users.find({packages:{$in: pkg.name}},function(err,users){
+				callback(err,users)
+			})
+		},
+		function(users,callback){
+			mailer.sendMulti(
+				users, //recipients
+				'[' + config.get('app.name') + '] ' + pkg.name + ' has been updated',
+				packageUpdatedTemplate,
+				{
+					pkg: pkg,
+				},
+				'package-updated-' + pkg.name,
+				function(err){
+					callback(err)
+				}
+				
+			);
+		}
+	],function(err){
+		callback(err)
+	})
+	
 	
 }
 

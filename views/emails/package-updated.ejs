@@ -1,0 +1,19 @@
+<h4>
+Hi %recipient.name%,
+</h4>
+
+<p>
+Package <%=pkg.name%> has been updated and is now in version <%=pkg.version%> 
+</p> 
+
+<p>
+Cheers,<br/>
+The <%=config.get('app.name')%> team
+</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>
+To stop getting this email: http://<%=config.get('app.domain')%>/unsubscribe/<%=email_type%>/%recipient.id%/%recipient.code%<br/>
+To unsubscribe from all <%=config.get('app.name')%> emails: http://<%=config.get('app.domain')%>/unsubscribe/all/%recipient.id%/%recipient.code%
+</p> 
