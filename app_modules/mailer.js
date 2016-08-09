@@ -1,6 +1,6 @@
 var ejs = require('ejs');
 var fs = require('fs');
-var appConfig = require('config');
+var config = require('config');
 
 var request = require('request');
 var moment = require('moment');
@@ -18,8 +18,10 @@ var unsubscriber = require('../app_modules/unsubscriber');
 module.exports = {
 	sendMulti: function(recipients,subject,template,params,emailType,callback){
 
+console.log('HERE')		
+		
 		// add some common stuff to params
-		params.appConfig = appConfig;
+		params.config = config;
 		params.email_type = emailType;
 		var body = ejs.render(template,params);
 
@@ -66,14 +68,14 @@ module.exports = {
 	//console.log('batchSets is: %s',util.inspect(batchSets));
 		async.each(batchSets,function(batchSet,callback){
 			var options = {
-				url: 'https://api.mailgun.net/v2/' + appConfig.get('mailgun.domain') + '/messages',
+				url: 'https://api.mailgun.net/v2/' + config.get('mailgun.domain') + '/messages',
 				auth:{
 					username: 'api',
-					password: appConfig.get('mailgun.api_key'),
+					password: config.get('mailgun.api_key'),
 					sendImmediately: false
 				},
 				form: {
-					from: appConfig.get('app.name') + ' <' + appConfig.get('app.email') + '>',
+					from: config.get('app.name') + ' <' + config.get('app.email') + '>',
 					to: batchSet.to,
 					'recipient-variables': JSON.stringify(batchSet.recipientVariables),
 					subject: subject,

@@ -17,6 +17,7 @@ var path = require('path')
 
 var errorHandler = require('../app_modules/error');
 var github = require('../app_modules/github');
+var mailer = require('../app_modules/mailer');
 
 
 router.get('/', function(req, res, next) {
@@ -44,6 +45,7 @@ console.log('recieved this distinct list of pkgs: %s',util.inspect(packages))
 		},
 	],function(err){
 		if(err){
+			console.log('final err is: %s',err)
 			res.sendStatus(500)
 		}else{
 			res.sendStatus(200)
@@ -123,11 +125,13 @@ function notifyUsers(pkg,db,callback){
 	async.waterfall([
 		function(callback){
 			var users = db.get('users');
-			users.find({packages:{$in: pkg.name}},function(err,users){
+			users.find({packages: pkg.name},function(err,users){
+console.log('HERE1')				
 				callback(err,users)
 			})
 		},
 		function(users,callback){
+console.log('HERE2')				
 			mailer.sendMulti(
 				users, //recipients
 				'[' + config.get('app.name') + '] ' + pkg.name + ' has been updated',
@@ -143,6 +147,7 @@ function notifyUsers(pkg,db,callback){
 			);
 		}
 	],function(err){
+console.log('err in notifyUsers: %s',err)		
 		callback(err)
 	})
 	
