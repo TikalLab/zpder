@@ -53,6 +53,88 @@ console.log('recieved this distinct list of pkgs: %s',util.inspect(packages))
 	})
 });
 
+router.post('/index-all-users', function(req, res, next) {
+	async.waterfall([
+		// find all indexed packages from all users                 
+		function(callback){
+			var users = req.db.get('users');
+			users.find({},function(err,users){
+				callback(err,users)
+			})
+		},
+		function(users,callback){
+			async.each(users,function(user,callback){
+				indexUser(user,req.db,function(err,user){
+					callback(err)
+				})
+			},function(err){
+				callback(err)
+			})
+		},
+	],function(err){
+		if(err){
+			console.log('final err is: %s',err)
+			res.sendStatus(500)
+		}else{
+			res.sendStatus(200)
+		}
+	})
+});
+
+function indexUser(user,db,callback){
+	async.waterfall([
+ 		function(callback){
+ 			github.getUserRepos(user.github.access_token,function(err,repos){
+ 				callback(err,repos)
+ 			})
+ 		},	                 
+ 		function(repos,callback){
+ 			var packages = [];
+ 			async.each(repos,function(repo,callback){
+ 				github.getRepoPackage(user.github.access_token,repo.full_name,function(err,pkg){
+ 					if(err){
+ 						callback(err)
+ 					}else{
+ 						if(pkg){
+ 							packages.push(pkg)
+ 						}
+ 						callback()
+ 					}
+ 				})
+ 			},function(err){
+ 				callback(err,packages)
+ 			})
+ 		},
+ 		function(packages,callback){
+ 			var allPacakges = [];
+ 			_.each(packages,function(pkg){
+ 				if('content' in pkg){
+ 					var dependencies = JSON.parse(atob(pkg.content)).dependencies;
+ 					allPacakges = allPacakges.concat(_.keys(dependencies))
+ 				}
+ 			})
+ 			allPacakges = _.uniq(allPacakges);
+ 			var users = db.get('users');
+ 			users.findAndModify({
+ 				_id: user._id
+ 			},{
+ 				$set: {packages: allPacakges}
+ 			},{
+ 				new: true
+ 			},function(err,user){
+ 				if(err){
+ 					callback(err)
+ 				}else{
+ 					callback(err,user)
+ 				}
+ 			})
+ 		}
+ 	],function(err,user){
+		callback(err,user)
+ 	})
+	
+}
+
 
 function getPackageVersion(pkg,callback){
 	request('https://www.npmjs.com/package/' + pkg,function(error,response,body){
