@@ -12,6 +12,8 @@ var nl2br = require('nl2br');
 var marked = require('marked');
 var atob = require('atob')
 var cheerio = require('cheerio')
+var fs = require('fs')
+var path = require('path')
 
 var errorHandler = require('../app_modules/error');
 var github = require('../app_modules/github');
@@ -27,6 +29,7 @@ router.post('/maintain', function(req, res, next) {
 		function(callback){
 			var users = req.db.get('users');
 			users.distinct('packages',function(err,packages){
+console.log('recieved this distinct list of pkgs: %s',util.inspect(packages))				
 				callback(err,packages)
 			})
 		},
@@ -41,9 +44,9 @@ router.post('/maintain', function(req, res, next) {
 		},
 	],function(err){
 		if(err){
-			
+			res.sendStatus(500)
 		}else{
-			
+			res.sendStatus(200)
 		}
 	})
 });
@@ -65,7 +68,9 @@ function getPackageVersion(pkg,callback){
 }
 
 function updatePackageVersion(pkg,db,callback){
-	
+
+	var packages = db.get('packages');
+
 	async.waterfall([
 		function(callback){
 			request('https://www.npmjs.com/package/' + pkg,function(error,response,body){
@@ -76,31 +81,30 @@ function updatePackageVersion(pkg,db,callback){
 				}else{
 					var $ = cheerio.load(body);
 					var version = $('.sidebar .box li:nth-child(2) strong').html()
-//					console.log('version of %s is %s',pkg,version)
+					console.log('version of %s is %s',pkg,version)
 					callback(null,version)
 				}
 			})
 		},
 		function(version,callback){
-			var packages = db.get('packages');
-			pacakges.findOne({name: pkg},function(err,pkg){
-				callback(err,version,pkg)
+			packages.findOne({name: pkg},function(err,pkgObj){
+				callback(err,version,pkgObj)
 			})
 		},
-		function(version,pkg,callback){
-			if(version == pkg.version){
+		function(version,pkgObj,callback){
+			if(pkgObj && version == pkgObj.version){
 				callback(null,false)
 			}else{
-				packages.findAndModify({_id: pkg._id.toString()},{$set:{version: version}},{new: true},function(err,pkg){
-					callback(err,pkg)
+				packages.findAndModify({name: pkg},{$set:{version: version}},{new: true, upsert: true},function(err,pkgObj){
+					callback(err,pkgObj)
 				})
 			}
 		},
-		function(pkg,callback){
-			if(!pkg){
+		function(pkgObj){
+			if(!pkgObj){
 				callback()
 			}else{
-				notifyUsers(pkg,db,function(err){
+				notifyUsers(pkgObj,db,function(err){
 					callback(err)
 				})
 			}
