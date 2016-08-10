@@ -40,7 +40,7 @@ router.get('/explore', function(req, res, next) {
 //						callback()
 //					}
 //				})
-				github.searchRepoPackages(req.session.user.github.access_token,repo.full_name,function(err,repoPackages){
+				github.getRepoPackages(req.session.user.github.access_token,repo.full_name,function(err,repoPackages){
 					if(err){
 						callback(err)
 					}else{
@@ -50,6 +50,16 @@ router.get('/explore', function(req, res, next) {
 						callback()
 					}
 				})
+//				github.searchRepoPackages(req.session.user.github.access_token,repo.full_name,function(err,repoPackages){
+//					if(err){
+//						callback(err)
+//					}else{
+//						if(repoPackages){
+//							packages = packages.concat(repoPackages)
+//						}
+//						callback()
+//					}
+//				})
 			},function(err){
 				callback(err,packages)
 			})

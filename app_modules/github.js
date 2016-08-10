@@ -1,6 +1,7 @@
 var config = require('config');
 var request = require('request');
 var _ = require('underscore');
+var us = require('underscore.string')
 var util = require('util');
 var async = require('async')
 var parseLinkHeader = require('parse-link-header');
@@ -85,14 +86,14 @@ console.log('master of %s is: %s',repo,util.inspect(master))
 				});	
 			},
 			function(master,callback){
-				thisObject.getTreeRecursively(accessToken,repo,master.object.sha,function(err,items){
+				thisObject.getTree(accessToken,repo,master.object.sha,function(err,items){
 					callback(err,items)
 				})
 			},
 			function(items,callback){
 				var packages = [];
 				async.each(items,function(item,callback){
-					if(item.path != 'package.json'){
+					if(!us.endsWith(item.path,'package.json') || us.include(item.path,'node_modules')){
 						callback()
 					}else{
 						request(item.url,{headers: headers},function(error,response,body){
@@ -111,6 +112,33 @@ console.log('master of %s is: %s',repo,util.inspect(master))
 					callback(err,packages)
 				})
 			}
+//			function(master,callback){
+//				thisObject.getTreeRecursively(accessToken,repo,master.object.sha,function(err,items){
+//					callback(err,items)
+//				})
+//			},
+//			function(items,callback){
+//				var packages = [];
+//				async.each(items,function(item,callback){
+//					if(item.path != 'package.json'){
+//						callback()
+//					}else{
+//						request(item.url,{headers: headers},function(error,response,body){
+//							if(error){
+//								callback(error);
+//							}else if(response.statusCode > 300){
+//								callback(response.statusCode + ' : ' + body);
+//							}else{
+//								var data = JSON.parse(body)
+//								packages.push(data);
+//								callback();
+//							}
+//						});	
+//					} 
+//				},function(err){
+//					callback(err,packages)
+//				})
+//			}
 		],function(err,packages){
 			callback(err,packages)
 		})
@@ -137,7 +165,7 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 			},
 			function(tree,callback){
 				async.each(tree,function(item,callback){
-					if(item.type == 'tree'){
+					if(item.type == 'tree' && item.name != 'node_modules'){
 						thisObject.getTreeRecursively(accessToken, repo, item.sha, function(err,newItems){
 							if(err){
 								callback(err)
@@ -159,7 +187,34 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 		})
 		
 	},
+	getTree: function(accessToken,repo,sha,callback){
+		var thisObject = this;
+		var headers = this.getAPIHeaders(accessToken);
+		async.waterfall([
+			function(callback){
+				var qs = {
+					recursive: '1'	
+				}
+				request('https://api.github.com/repos/' + repo + '/git/trees/' + sha,{headers: headers, qs: qs},function(error,response,body){
+					if(error){
+						callback(error);
+					}else if(response.statusCode > 300){
+						callback(response.statusCode + ' : ' + body);
+					}else{
+						var data = JSON.parse(body)
+//console.log('tree for %s is: %s',sha,util.inspect(data.tree))						
+						callback(null,data.tree);
+					}
+				});	
+			},
+		],function(err,items){
+			callback(err,items)
+		})
+		
+	},
 	searchRepoPackages: function(accessToken,repo,callback){
+		var headers = this.getAPIHeaders(accessToken);
+
 		async.waterfall([
 			function(callback){
 				request('https://api.github.com/search/code?q=package.json+in:path+repo:' + repo,{headers: headers},function(error,response,body){
@@ -186,6 +241,7 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 								callback(response.statusCode + ' : ' + body);
 							}else{
 								var data = JSON.parse(body)
+console.log('found this package: %s',util.inspect(data))								
 								packages.push(data);
 								callback();
 							}
