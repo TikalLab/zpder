@@ -92,16 +92,26 @@ function indexUser(user,db,callback){
  		function(repos,callback){
  			var packages = [];
  			async.each(repos,function(repo,callback){
- 				github.getRepoPackage(user.github.access_token,repo.full_name,function(err,pkg){
- 					if(err){
- 						callback(err)
- 					}else{
- 						if(pkg){
- 							packages.push(pkg)
- 						}
- 						callback()
- 					}
- 				})
+// 				github.getRepoPackage(user.github.access_token,repo.full_name,function(err,pkg){
+// 					if(err){
+// 						callback(err)
+// 					}else{
+// 						if(pkg){
+// 							packages.push(pkg)
+// 						}
+// 						callback()
+// 					}
+// 				})
+				github.getRepoPackages(user.github.access_token,repo.full_name,function(err,repoPackages){
+					if(err){
+						callback(err)
+					}else{
+						if(repoPackages){
+							packages = packages.concat(repoPackages)
+						}
+						callback()
+					}
+				})
  			},function(err){
  				callback(err,packages)
  			})
