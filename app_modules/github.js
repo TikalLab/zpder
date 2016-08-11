@@ -261,6 +261,47 @@ console.log('found this package: %s',util.inspect(data))
 		],function(err,packages){
 			callback(err,packages)
 		})
+	},
+	getChangeLogLink: function(accessToken,repo,callback){
+		var headers = this.getAPIHeaders(accessToken);
+		async.parallel([
+			function(callback){
+				request('https://api.github.com/search/code?q=chnagelog.md+in:path+repo:' + repo,{headers: headers},function(error,response,body){
+					if(error){
+						callback(error);
+					}else if(response.statusCode > 300){
+						callback(response.statusCode + ' : ' + body);
+					}else{
+						var data = JSON.parse(body)
+						callback(null,data);
+					}
+				});		
+			},
+			function(callback){
+				request('https://api.github.com/search/code?q=history.md+in:path+repo:' + repo,{headers: headers},function(error,response,body){
+					if(error){
+						callback(error);
+					}else if(response.statusCode > 300){
+						callback(response.statusCode + ' : ' + body);
+					}else{
+						var data = JSON.parse(body)
+						callback(null,data);
+					}
+				});		
+			},
+		],function(err,results){
+			if(err){
+				callback(err)
+			}else{
+				if(results[0].items.length > 0){
+					callback(null,results[0].items[0].html_url)
+				}else if(results[1].items.length > 0){
+					callback(null,results[0].items[0].html_url)
+				}else{
+					callback(null,null)
+				}
+			}
+		})
 	}
 
 

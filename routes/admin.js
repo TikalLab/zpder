@@ -178,31 +178,34 @@ function updatePackageVersion(pkg,db,callback){
 				}else{
 					var $ = cheerio.load(body);
 					var version = $('.sidebar .box li:nth-child(2) strong').html()
+					var repoUrl = $('.sidebar .box li:nth-child(3) a').html();
+					var parts = repoUrl.split('/');
+					var repo = parts[parts.length - 2] + '/' + parts[parts.length - 1];
 					console.log('version of %s is %s',pkg,version)
-					callback(null,version)
+					callback(null,version,repo)
 				}
 			})
 		},
-		function(version,callback){
+		function(version,repo,callback){
 			packages.findOne({name: pkg},function(err,pkgObj){
-				callback(err,version,pkgObj)
+				callback(err,version,repo,pkgObj)
 			})
 		},
-		function(version,pkgObj,callback){
+		function(version,repo,pkgObj,callback){
 			if(pkgObj && version == pkgObj.version){
-				callback(null,false,false)
+				callback(null,repo,false,false)
 			}else{
 				var isNew = !pkgObj;
 				packages.findAndModify({name: pkg},{$set:{version: version}},{new: true, upsert: true},function(err,pkgObj){
-					callback(err,pkgObj,isNew)
+					callback(err,repo,pkgObj,isNew)
 				})
 			}
 		},
-		function(pkgObj,isNew,callback){
+		function(repo,pkgObj,isNew,callback){
 			if(!pkgObj || isNew){
 				callback()
 			}else{
-				notifyUsers(pkgObj,db,function(err){
+				notifyUsers(repo,pkgObj,db,function(err){
 					callback(err)
 				})
 			}
@@ -216,24 +219,29 @@ function updatePackageVersion(pkg,db,callback){
 
 var packageUpdatedTemplate = fs.readFileSync(path.join(__dirname,'../views/emails/package-updated.ejs'), 'utf8');
 
-function notifyUsers(pkg,db,callback){
+function notifyUsers(repo,pkg,db,callback){
 	
 	async.waterfall([
 		function(callback){
 			var users = db.get('users');
 			users.find({packages: pkg.name},function(err,users){
-console.log('HERE1')				
 				callback(err,users)
 			})
 		},
+		// get the repo history
 		function(users,callback){
-console.log('HERE2')				
+			github.getChangeLogLink(users[0].github.access_token,repo,function(err,chnageLogLink){
+				callback(err,users,chnageLogLink)
+			})
+		},
+		function(users,chnageLogLink,callback){
 			mailer.sendMulti(
 				users, //recipients
 				'[' + config.get('app.name') + '] ' + pkg.name + ' has been updated',
 				packageUpdatedTemplate,
 				{
 					pkg: pkg,
+					change_log_link: chnageLogLink
 				},
 				'package-updated-' + pkg.name,
 				function(err){
