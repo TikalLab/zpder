@@ -178,10 +178,10 @@ function updatePackageVersion(pkg,db,callback){
 				}else{
 					var $ = cheerio.load(body);
 					var version = $('.sidebar .box li:nth-child(2) strong').html()
+					console.log('version of %s is %s',pkg,version)
 					var repoUrl = $('.sidebar .box li:nth-child(3) a').html();
 					var parts = repoUrl.split('/');
 					var repo = parts[parts.length - 2] + '/' + parts[parts.length - 1];
-					console.log('version of %s is %s',pkg,version)
 					callback(null,version,repo)
 				}
 			})
