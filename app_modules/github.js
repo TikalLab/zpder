@@ -296,7 +296,7 @@ console.log('found this package: %s',util.inspect(data))
 				if(results[0].items.length > 0){
 					callback(null,results[0].items[0].html_url)
 				}else if(results[1].items.length > 0){
-					callback(null,results[0].items[0].html_url)
+					callback(null,results[1].items[0].html_url)
 				}else{
 					callback(null,null)
 				}
