@@ -179,9 +179,12 @@ function updatePackageVersion(pkg,db,callback){
 					var $ = cheerio.load(body);
 					var version = $('.sidebar .box li:nth-child(2) strong').html()
 					console.log('version of %s is %s',pkg,version)
+					var repo;
 					var repoUrl = $('.sidebar .box li:nth-child(3) a').html();
-					var parts = repoUrl.split('/');
-					var repo = parts[parts.length - 2] + '/' + parts[parts.length - 1];
+					if(repoUrl){
+						var parts = repoUrl.split('/');
+						repo = parts[parts.length - 2] + '/' + parts[parts.length - 1];
+					}
 					callback(null,version,repo)
 				}
 			})
@@ -230,9 +233,13 @@ function notifyUsers(repo,pkg,db,callback){
 		},
 		// get the repo history
 		function(users,callback){
-			github.getChangeLogLink(users[0].github.access_token,repo,function(err,chnageLogLink){
-				callback(err,users,chnageLogLink)
-			})
+			if(!repo){
+				callback(null,users,null)
+			}else{
+				github.getChangeLogLink(users[0].github.access_token,repo,function(err,chnageLogLink){
+					callback(err,users,chnageLogLink)
+				})
+			}
 		},
 		function(users,chnageLogLink,callback){
 			mailer.sendMulti(
