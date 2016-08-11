@@ -147,7 +147,6 @@ console.log('default branch for %s is %s',repo.full_name,repo.default_branch)
 //				})
 //			}
 		],function(err,packages){
-console.log('pkg count for %s is %s',repo.full_name,packages.length)			
 			callback(err,packages)
 		})
 		
