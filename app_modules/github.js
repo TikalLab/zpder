@@ -73,21 +73,28 @@ console.log('package file for %s is: %s',repo,util.inspect(data))
 		async.waterfall([
 			// get the master branch's sha...                 
 			function(callback){
-				request('https://api.github.com/repos/' + repo + '/git/refs/heads/master',{headers: headers},function(error,response,body){
+console.log('default branch for %s is %s',repo.full_name,repo.default_branch)				
+//				request('https://api.github.com/repos/' + repo.full_name + '/git/refs/heads/' + repo.default_branch,{headers: headers},function(error,response,body){
+				request('https://api.github.com/repos/' + repo.full_name + '/branches/' + repo.default_branch,{headers: headers},function(error,response,body){
 					if(error){
 						callback(error);
 					}else if(response.statusCode > 300){
 						callback(response.statusCode + ' : ' + body);
 					}else{
 						var master = JSON.parse(body)
-console.log('master of %s is: %s',repo,util.inspect(master))						
+//console.log('master of %s is: %s',repo,util.inspect(master))						
 						callback(null,master);
 					}
 				});	
 			},
 			function(master,callback){
-				thisObject.getTree(accessToken,repo,master.object.sha,function(err,items){
-					callback(err,items)
+				thisObject.getTree(accessToken,repo,master.commit.sha,function(err,items){
+					if(err){
+						console.log('err is getTree for %s: %s',repo.full_name,err)
+						callback(null,[])
+					}else{
+						callback(err,items)
+					}
 				})
 			},
 			function(items,callback){
@@ -140,6 +147,7 @@ console.log('master of %s is: %s',repo,util.inspect(master))
 //				})
 //			}
 		],function(err,packages){
+console.log('pkg count for %s is %s',repo.full_name,packages.length)			
 			callback(err,packages)
 		})
 		
@@ -195,7 +203,7 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 				var qs = {
 					recursive: '1'	
 				}
-				request('https://api.github.com/repos/' + repo + '/git/trees/' + sha,{headers: headers, qs: qs},function(error,response,body){
+				request('https://api.github.com/repos/' + repo.full_name + '/git/trees/' + sha,{headers: headers, qs: qs},function(error,response,body){
 					if(error){
 						callback(error);
 					}else if(response.statusCode > 300){

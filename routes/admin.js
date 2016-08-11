@@ -102,8 +102,9 @@ function indexUser(user,db,callback){
 // 						callback()
 // 					}
 // 				})
-				github.getRepoPackages(user.github.access_token,repo.full_name,function(err,repoPackages){
+				github.getRepoPackages(user.github.access_token,repo,function(err,repoPackages){
 					if(err){
+console.log('err is in repo: %s',repo.full_name)						
 						callback(err)
 					}else{
 						if(repoPackages){
