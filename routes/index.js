@@ -82,6 +82,7 @@ router.get('/explore', function(req, res, next) {
 				}
 			})
 			allPacakges = _.uniq(allPacakges);
+			allPacakges.sort();
 			var users = req.db.get('users');
 			users.findAndModify({
 				_id: req.session.user._id
