@@ -14,6 +14,7 @@ var atob = require('atob')
 
 var errorHandler = require('../app_modules/error');
 var github = require('../app_modules/github');
+var unsubscriber = require('../app_modules/unsubscriber');
 
 
 router.get('/', function(req, res, next) {
@@ -112,6 +113,26 @@ router.get('/explore', function(req, res, next) {
 	})
 	
 });
+
+router.get('/unsubscribe/:email_type/:user_id/:code', function(req, res, next) {
+	if(!unsubscriber.verify(req.params.user_id,req.params.code)){
+		// now what?
+	}else{
+		var users = req.db.get('users');
+		var updateSet = {};
+		updateSet['unsubscribes.' + req.params.email_type] = true;
+		users.update({_id: req.params.user_id},{$set:updateSet},function(err,ok){
+			if(err){
+				errorHandler.error(req,res,next,err);
+			}else{
+				render(req,res,'index/unsubscribed',{
+					email_type: req.params.email_type
+				})
+			}
+		})
+	}
+});
+
 
 function render(req,res,template,params){
 	
