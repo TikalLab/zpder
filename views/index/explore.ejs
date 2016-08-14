@@ -1,7 +1,11 @@
-<table>
-<% packages.forEach(function(pkg){ %>
-	<tr>
-		<td><%=pkg%></td>
-	</tr>
-<% }) %>
-</table>
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<table class="table">
+		<% packages.forEach(function(pkg){ %>
+			<tr>
+				<td><%=pkg%></td>
+			</tr>
+		<% }) %>
+		</table>
+	</div>
+</div>

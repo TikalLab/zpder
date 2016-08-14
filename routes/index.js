@@ -17,7 +17,11 @@ var github = require('../app_modules/github');
 
 
 router.get('/', function(req, res, next) {
-	render(req,res,'index/index',{})
+	if(!req.session.user){
+		render(req,res,'index/index',{})
+	}else{
+		res.redirect('/explore')
+	}
 });
 
 router.get('/logout', function(req, res, next) {
