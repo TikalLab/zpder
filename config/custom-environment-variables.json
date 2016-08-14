@@ -1,0 +1,15 @@
+{
+	"app": {
+		"unsubscribe_secret": "APP_UNSUBSCRIBE_SECRET",
+		"cookie_secret": "APP_COOKIE_SECRET"
+	},
+	"github": {
+		"client_secret": "GITHUB_CLIENT_SECRET",
+	},
+	"auth": {
+		"password": "AUTH_PASSWORD"
+	},
+	"mailgun": {
+		"api_key": "MAILGUN_API_KEY"
+	}
+}

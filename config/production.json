@@ -1,0 +1,19 @@
+{
+	"github": {
+		"client_id": "4d3356c29435a697f9db",
+		"client_secret": "",
+		"redirect_domain": "zpder.herokuapp.com"
+	},
+	"mailgun": {
+		"api_key": "",
+		"domain": "tikalk.com"
+	},
+	"app": {
+		"name": "ZPDer",
+		"domain": "zpder.herokuapp.com",
+		"email": "shaharsol@tikalk.com",
+		"cookie_secret": "",
+		"unsubscribe_secret": "",
+		"cdn_url": ""
+	}
+}
