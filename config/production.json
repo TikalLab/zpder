@@ -6,7 +6,7 @@
 	},
 	"mailgun": {
 		"api_key": "",
-		"domain": "tikalk.com"
+		"domain": "mg.tikalk.com"
 	},
 	"app": {
 		"name": "ZPDer",
