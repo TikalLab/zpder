@@ -20,6 +20,11 @@ router.get('/', function(req, res, next) {
 	render(req,res,'index/index',{})
 });
 
+router.get('/logout', function(req, res, next) {
+	delete req.session.user;
+	res.redirect('/')
+});
+
 router.get('/explore', function(req, res, next) {
 	async.waterfall([
 		function(callback){
