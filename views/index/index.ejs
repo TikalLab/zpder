@@ -1,5 +1,12 @@
-<% if(!user){ %>
-<a href="/github/authorize">Sign in</a>
-<% }else{ %>
-<p>all is good, <a href="/explore">explore now</a></p>
-<% } %>
+<div class="row">
+	<div class="col-md-6">
+		<% if(!user){ %>
+		<a href="/github/authorize" class="btn btn-block btn-social btn-github">
+		    <span class="fa fa-github"></span> Sign in with GitHub
+		  </a>
+		<% }else{ %>
+		<p>all is good, <a href="/explore">explore now</a></p>
+		<% } %>
+	</div>
+</div>
+
