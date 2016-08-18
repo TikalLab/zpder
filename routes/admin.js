@@ -197,6 +197,8 @@ function updatePackageVersion(pkg,db,callback){
 		function(version,repo,pkgObj,callback){
 			if(pkgObj && version == pkgObj.version){
 				callback(null,repo,false,false)
+			}else if(!version){
+				callback(null,repo,false,false)
 			}else{
 				var isNew = !pkgObj;
 				packages.findAndModify({name: pkg},{$set:{version: version}},{new: true, upsert: true},function(err,pkgObj){
