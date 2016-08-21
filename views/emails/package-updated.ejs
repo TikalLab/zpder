@@ -3,10 +3,12 @@ Hi %recipient.name%,
 </h4>
 
 <p>
-Package <strong><%=pkg.name%></strong> has been updated and is now in version <strong><%=pkg.version%></strong>.
+Package <a href="https://www.npmjs.com/package/<%=pkg.name%>"><%=pkg.name%></a> has been updated and is now in version <strong><%=pkg.version%></strong>.
 
 <% if(change_log_link){ %>
 You can see the changelog <a href="<%=change_log_link%>">here</a>. 
+<% }else{ %>
+<%=pkg.name%> does not maintain a changelog, but you may find news about the version update <a href="https://github.com/<%=repo%>">here</a>.
 <% } %>
 </p> 
 

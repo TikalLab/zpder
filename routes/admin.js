@@ -250,7 +250,8 @@ function notifyUsers(repo,pkg,db,callback){
 				packageUpdatedTemplate,
 				{
 					pkg: pkg,
-					change_log_link: chnageLogLink
+					change_log_link: chnageLogLink,
+					repo: repo
 				},
 				'package-updated-' + pkg.name,
 				function(err){
