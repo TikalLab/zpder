@@ -26,11 +26,11 @@ router.get('/', function(req, res, next) {
 
 router.post('/maintain', function(req, res, next) {
 	async.waterfall([
-		// find all indexed packages from all users                 
+		// find all indexed packages from all users
 		function(callback){
 			var users = req.db.get('users');
 			users.distinct('packages',function(err,packages){
-console.log('recieved this distinct list of pkgs: %s',util.inspect(packages))				
+console.log('recieved this distinct list of pkgs: %s',util.inspect(packages))
 				callback(err,packages)
 			})
 		},
@@ -56,7 +56,7 @@ console.log('recieved this distinct list of pkgs: %s',util.inspect(packages))
 
 router.post('/index-all-users', function(req, res, next) {
 	async.waterfall([
-		// find all indexed packages from all users                 
+		// find all indexed packages from all users
 		function(callback){
 			var users = req.db.get('users');
 			users.find({},function(err,users){
@@ -88,7 +88,7 @@ function indexUser(user,db,callback){
  			github.getUserRepos(user.github.access_token,function(err,repos){
  				callback(err,repos)
  			})
- 		},	                 
+ 		},
  		function(repos,callback){
  			var packages = [];
  			async.each(repos,function(repo,callback){
@@ -104,7 +104,7 @@ function indexUser(user,db,callback){
 // 				})
 				github.getRepoPackages(user.github.access_token,repo,function(err,repoPackages){
 					if(err){
-console.log('err is in repo: %s',repo.full_name)						
+console.log('err is in repo: %s',repo.full_name)
 						callback(err)
 					}else{
 						if(repoPackages){
@@ -121,8 +121,12 @@ console.log('err is in repo: %s',repo.full_name)
  			var allPacakges = [];
  			_.each(packages,function(pkg){
  				if('content' in pkg){
- 					var dependencies = JSON.parse(atob(pkg.content)).dependencies;
- 					allPacakges = allPacakges.concat(_.keys(dependencies))
+					try{
+						var dependencies = JSON.parse(atob(pkg.content)).dependencies;
+	 					allPacakges = allPacakges.concat(_.keys(dependencies))
+					}catch(e){
+						// ignore
+					}
  				}
  			})
  			allPacakges = _.uniq(allPacakges);
@@ -145,7 +149,7 @@ console.log('err is in repo: %s',repo.full_name)
  	],function(err,user){
 		callback(err,user)
  	})
-	
+
 }
 
 
@@ -218,14 +222,14 @@ function updatePackageVersion(pkg,db,callback){
 	],function(err){
 		callback(err)
 	})
-	
-	
+
+
 }
 
 var packageUpdatedTemplate = fs.readFileSync(path.join(__dirname,'../views/emails/package-updated.ejs'), 'utf8');
 
 function notifyUsers(repo,pkg,db,callback){
-	
+
 	async.waterfall([
 		function(callback){
 			var users = db.get('users');
@@ -257,40 +261,40 @@ function notifyUsers(repo,pkg,db,callback){
 				function(err){
 					callback(err)
 				}
-				
+
 			);
 		}
 	],function(err){
-console.log('err in notifyUsers: %s',err)		
+console.log('err in notifyUsers: %s',err)
 		callback(err)
 	})
-	
-	
+
+
 }
 
 function render(req,res,template,params){
-	
+
 	params.user = req.session.user;
 	params.app = req.app;
 	params.config = config;
-	
+
 	if(!('isHomepage' in params)){
 		params.isHomepage = false;
 	}
-	
+
 	if(!('isDevelopersHomepage' in params)){
 		params.isDevelopersHomepage = false;
 	}
-	
+
 	if(!('isOpenSourceHomepage' in params)){
 		params.isOpenSourceHomepage = false;
 	}
-	
+
 	if(!('isOrgsHomepage' in params)){
 		params.isOrgsHomepage = false;
 	}
-	
-	
+
+
 	res.render(template,params);
 }
 

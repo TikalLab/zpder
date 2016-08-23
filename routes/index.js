@@ -36,7 +36,7 @@ router.get('/explore', function(req, res, next) {
 			github.getUserRepos(req.session.user.github.access_token,function(err,repos){
 				callback(err,repos)
 			})
-		},	                 
+		},
 		function(repos,callback){
 			var packages = [];
 			async.each(repos,function(repo,callback){
@@ -78,8 +78,12 @@ router.get('/explore', function(req, res, next) {
 			var allPacakges = [];
 			_.each(packages,function(pkg){
 				if('content' in pkg){
-					var dependencies = JSON.parse(atob(pkg.content)).dependencies;
-					allPacakges = allPacakges.concat(_.keys(dependencies))
+					try{
+						var dependencies = JSON.parse(atob(pkg.content)).dependencies;
+						allPacakges = allPacakges.concat(_.keys(dependencies))
+					}catch(e){
+							// ignore
+					}
 				}
 			})
 			allPacakges = _.uniq(allPacakges);
@@ -104,14 +108,14 @@ router.get('/explore', function(req, res, next) {
 			errorHandler.error(req,res,next,err)
 		}else{
 			req.session.user = user
-			
+
 			// process what we got
 			render(req,res,'index/explore',{
 				packages: user.packages
 			})
 		}
 	})
-	
+
 });
 
 router.get('/unsubscribe/:email_type/:user_id/:code', function(req, res, next) {
@@ -135,28 +139,28 @@ router.get('/unsubscribe/:email_type/:user_id/:code', function(req, res, next) {
 
 
 function render(req,res,template,params){
-	
+
 	params.user = req.session.user;
 	params.app = req.app;
 	params.config = config;
-	
+
 	if(!('isHomepage' in params)){
 		params.isHomepage = false;
 	}
-	
+
 	if(!('isDevelopersHomepage' in params)){
 		params.isDevelopersHomepage = false;
 	}
-	
+
 	if(!('isOpenSourceHomepage' in params)){
 		params.isOpenSourceHomepage = false;
 	}
-	
+
 	if(!('isOrgsHomepage' in params)){
 		params.isOrgsHomepage = false;
 	}
-	
-	
+
+
 	res.render(template,params);
 }
 
