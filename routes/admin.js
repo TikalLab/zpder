@@ -220,7 +220,9 @@ function updatePackageVersion(pkg,db,callback){
 			}
 		}
 	],function(err){
-		callback(err)
+		consle.log('error in updatePackageVersion: %s',err);
+		// callback(err)
+		callback()
 	})
 
 
