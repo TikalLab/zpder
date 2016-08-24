@@ -1,0 +1,38 @@
+<div class="page-header">
+	<div class="page-title">
+		&nbsp;
+	</div>
+</div>
+
+
+<div class="panel panel-default">
+	<div class="panel-heading"><h6 class="panel-title"><i class="icon-table"></i> Latest Users</h6></div>
+	<div class="datatable">
+
+		<table class="table">
+			<thead>
+				<th>user id</th>
+				<th>signed up at</th>
+				<th>name</th>
+				<th>email</th>
+				<th># packages</th>
+				<th>unsubscribed?</th>
+			</thead>
+
+
+			<% users.forEach(function(user){ %>
+				<tr>
+					<td><%=user._id%></td>
+					<td><%=moment(user.created_at).calendar()%></td>
+					<td><%=user.github.username%></td>
+					<td><%=user.email%></td>
+					<td><%='packages' in user ? user.packages.length : 0%></td>
+					<td><%='unsubscribes' in user ? _.keys(user.unsubscribes).join(', ') : ''%></td>
+				</tr>
+			<% }) %>
+		</table>
+
+
+
+	</div>
+</div>

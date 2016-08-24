@@ -1,0 +1,30 @@
+<div class="page-header">
+	<div class="page-title">
+		&nbsp;
+	</div>
+</div>
+
+
+<div class="panel panel-default">
+	<div class="panel-heading"><h6 class="panel-title"><i class="icon-table"></i> Latest Users</h6></div>
+	<div class="datatable">
+
+		<table class="table">
+			<thead>
+				<th>name</th>
+				<th>version</th>
+			</thead>
+
+
+			<% packages.forEach(function(pkg){ %>
+				<tr>
+					<td><%=pkg.name%></td>
+					<td><%=pkg.version%></td>
+				</tr>
+			<% }) %>
+		</table>
+
+
+
+	</div>
+</div>

@@ -8,6 +8,10 @@
 		"api_key": "",
 		"domain": "mg.tikalk.com"
 	},
+	"auth": {
+		"username": "admin",
+		"password": ""
+	},
 	"app": {
 		"name": "ZPDer",
 		"domain": "zpder.herokuapp.com",

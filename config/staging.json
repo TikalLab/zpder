@@ -8,6 +8,10 @@
 		"api_key": "key-4k17ddypozi32xw7o9201-smeezy4fl8",
 		"domain": "infoxicate.com"
 	},
+	"auth": {
+		"username": "admin",
+		"password": "123456"
+	},
 	"app": {
 		"name": "zpder-staging",
 		"domain": "zpder-staging.herokuapp.com",

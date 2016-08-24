@@ -9,6 +9,9 @@
 	"auth": {
 		"password": "AUTH_PASSWORD"
 	},
+	"auth": {
+		"password": "AUTH_PASSWORD"
+	},
 	"mailgun": {
 		"api_key": "MAILGUN_API_KEY"
 	}
