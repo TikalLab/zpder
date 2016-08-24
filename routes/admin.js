@@ -21,10 +21,6 @@ var github = require('../app_modules/github');
 var mailer = require('../app_modules/mailer');
 
 
-router.get('/', function(req, res, next) {
-	render(req,res,'index/index',{})
-});
-
 router.post('/maintain', function(req, res, next) {
 	async.waterfall([
 		// find all indexed packages from all users
@@ -297,7 +293,9 @@ var auth = function (req, res, next) {
 };
 
 router.get('/',auth,function(req, res, next) {
-	render(req,res,'admin/index',{});
+	render(req,res,'admin/index',{
+		active_page: ''
+	});
 })
 
 router.get('/users',auth,function(req, res, next) {
