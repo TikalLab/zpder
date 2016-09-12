@@ -19,11 +19,11 @@ module.exports = {
 		var repos = [];
 		var page = 1;
 		var linkHeader;
-		
+
 		var qs = {
-			affiliation: 'owner,collaborator'	
+			affiliation: 'owner,collaborator'
 		}
-		
+
 		async.whilst(
 			function(){
 				return page;
@@ -41,7 +41,7 @@ module.exports = {
 						page = (linkHeader? ('next' in linkHeader ? linkHeader.next.page : false) : false);
 						callback(null,repos);
 					}
-				});	
+				});
 			},
 			function(err,repos){
 				callback(err,repos)
@@ -60,20 +60,20 @@ module.exports = {
 				callback(response.statusCode + ' : ' + body);
 			}else{
 				var data = JSON.parse(body)
-console.log('package file for %s is: %s',repo,util.inspect(data))				
+console.log('package file for %s is: %s',repo,util.inspect(data))
 				callback(null,data);
 			}
-		});	
+		});
 	},
 	// this looks for all package.json files in the master branch, and ignores node_modules
 	getRepoPackages: function(accessToken,repo,callback){
 		var thisObject = this;
 		var headers = this.getAPIHeaders(accessToken);
-		
+
 		async.waterfall([
-			// get the master branch's sha...                 
+			// get the master branch's sha...
 			function(callback){
-console.log('default branch for %s is %s',repo.full_name,repo.default_branch)				
+console.log('default branch for %s is %s',repo.full_name,repo.default_branch)
 //				request('https://api.github.com/repos/' + repo.full_name + '/git/refs/heads/' + repo.default_branch,{headers: headers},function(error,response,body){
 				request('https://api.github.com/repos/' + repo.full_name + '/branches/' + repo.default_branch,{headers: headers},function(error,response,body){
 					if(error){
@@ -82,10 +82,10 @@ console.log('default branch for %s is %s',repo.full_name,repo.default_branch)
 						callback(response.statusCode + ' : ' + body);
 					}else{
 						var master = JSON.parse(body)
-//console.log('master of %s is: %s',repo,util.inspect(master))						
+//console.log('master of %s is: %s',repo,util.inspect(master))
 						callback(null,master);
 					}
-				});	
+				});
 			},
 			function(master,callback){
 				thisObject.getTree(accessToken,repo,master.commit.sha,function(err,items){
@@ -113,8 +113,8 @@ console.log('default branch for %s is %s',repo.full_name,repo.default_branch)
 								packages.push(data);
 								callback();
 							}
-						});	
-					} 
+						});
+					}
 				},function(err){
 					callback(err,packages)
 				})
@@ -140,8 +140,8 @@ console.log('default branch for %s is %s',repo.full_name,repo.default_branch)
 //								packages.push(data);
 //								callback();
 //							}
-//						});	
-//					} 
+//						});
+//					}
 //				},function(err){
 //					callback(err,packages)
 //				})
@@ -149,8 +149,8 @@ console.log('default branch for %s is %s',repo.full_name,repo.default_branch)
 		],function(err,packages){
 			callback(err,packages)
 		})
-		
-		
+
+
 	},
 	getTreeRecursively: function(accessToken,repo,sha,callback){
 		var thisObject = this;
@@ -165,10 +165,10 @@ console.log('default branch for %s is %s',repo.full_name,repo.default_branch)
 						callback(response.statusCode + ' : ' + body);
 					}else{
 						var data = JSON.parse(body)
-console.log('tree for %s is: %s',sha,util.inspect(data.tree))						
+console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 						callback(null,data.tree);
 					}
-				});	
+				});
 			},
 			function(tree,callback){
 				async.each(tree,function(item,callback){
@@ -192,7 +192,7 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 		],function(err){
 			callback(err,items)
 		})
-		
+
 	},
 	getTree: function(accessToken,repo,sha,callback){
 		var thisObject = this;
@@ -200,7 +200,7 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 		async.waterfall([
 			function(callback){
 				var qs = {
-					recursive: '1'	
+					recursive: '1'
 				}
 				request('https://api.github.com/repos/' + repo.full_name + '/git/trees/' + sha,{headers: headers, qs: qs},function(error,response,body){
 					if(error){
@@ -209,15 +209,15 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 						callback(response.statusCode + ' : ' + body);
 					}else{
 						var data = JSON.parse(body)
-//console.log('tree for %s is: %s',sha,util.inspect(data.tree))						
+//console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 						callback(null,data.tree);
 					}
-				});	
+				});
 			},
 		],function(err,items){
 			callback(err,items)
 		})
-		
+
 	},
 	searchRepoPackages: function(accessToken,repo,callback){
 		var headers = this.getAPIHeaders(accessToken);
@@ -233,8 +233,8 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 						var data = JSON.parse(body)
 						callback(null,data);
 					}
-				});	
-			}, 
+				});
+			},
 			function(searchResults,callback){
 				var packages = [];
 				async.each(searchResults.items,function(item,callback){
@@ -248,11 +248,11 @@ console.log('tree for %s is: %s',sha,util.inspect(data.tree))
 								callback(response.statusCode + ' : ' + body);
 							}else{
 								var data = JSON.parse(body)
-console.log('found this package: %s',util.inspect(data))								
+console.log('found this package: %s',util.inspect(data))
 								packages.push(data);
 								callback();
 							}
-						});	
+						});
 					}
 				},function(err){
 					callback(err,packages)
@@ -266,7 +266,7 @@ console.log('found this package: %s',util.inspect(data))
 		var headers = this.getAPIHeaders(accessToken);
 		async.parallel([
 			function(callback){
-				request('https://api.github.com/search/code?q=chnagelog.md+in:path+repo:' + repo,{headers: headers},function(error,response,body){
+				request('https://api.github.com/search/code?q=changelog.md+in:path+repo:' + repo,{headers: headers},function(error,response,body){
 					if(error){
 						callback(error);
 					}else if(response.statusCode > 300){
@@ -275,7 +275,7 @@ console.log('found this package: %s',util.inspect(data))
 						var data = JSON.parse(body)
 						callback(null,data);
 					}
-				});		
+				});
 			},
 			function(callback){
 				request('https://api.github.com/search/code?q=history.md+in:path+repo:' + repo,{headers: headers},function(error,response,body){
@@ -287,7 +287,7 @@ console.log('found this package: %s',util.inspect(data))
 						var data = JSON.parse(body)
 						callback(null,data);
 					}
-				});		
+				});
 			},
 		],function(err,results){
 			if(err){
