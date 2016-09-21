@@ -1,6 +1,7 @@
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
 		<h1>ZPDer will infrom you whenever a npm package you use has been upgraded</h1>
+		<h3>How it works: You connect your Github. We that start scanning your code occasionally and map the npm packages you use. Whenever a package is updated, we send you an email with a link to the changelog</h3>
 		<% if(!user){ %>
 		<a href="/github/authorize" class="btn btn-block btn-lg btn-social btn-github">
 		    <span class="fa fa-github"></span> Sign in with GitHub
@@ -10,4 +11,3 @@
 		<% } %>
 	</div>
 </div>
-
