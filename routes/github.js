@@ -97,7 +97,7 @@ router.get('/authorized', function(req, res, next) {
 				avatar_url: githubUser.avatar_url
 			}
 			
-			users.findAndModify({
+			users.findOneAndUpdate({
 				'github.id': githubUser.id
 			},{
 				$setOnInsert:{

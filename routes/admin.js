@@ -129,7 +129,7 @@ console.log('err is in repo: %s',repo.full_name)
  			allPacakges = _.uniq(allPacakges);
  			allPacakges.sort()
  			var users = db.get('users');
- 			users.findAndModify({
+ 			users.findOneAndUpdate({
  				_id: user._id
  			},{
  				$set: {packages: allPacakges}
@@ -204,7 +204,7 @@ function updatePackageVersion(pkg,db,callback){
 				callback(null,repo,false,false)
 			}else{
 				var isNew = !pkgObj;
-				packages.findAndModify({name: pkg},{$set:{version: version}},{new: true, upsert: true},function(err,pkgObj){
+				packages.findOneAndUpdate({name: pkg},{$set:{version: version}},{new: true, upsert: true},function(err,pkgObj){
 					callback(err,repo,pkgObj,isNew)
 				})
 			}
